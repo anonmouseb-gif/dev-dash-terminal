@@ -1,37 +1,46 @@
-export default function Home() {
-  return (
-    <main style={{ backgroundColor: '#000', color: '#0f0', minHeight: '100vh', padding: '50px', fontFamily: 'monospace' }}>
-      <div style={{ maxWidth: '800px', margin: 'auto', border: '1px solid #00ff00', borderRadius: '5px', backgroundColor: '#050505', boxShadow: '0 0 20px #003300' }}>
-        
-        {/* Terminal Header */}
-        <div style={{ background: '#1a1a1a', padding: '10px', display: 'flex', gap: '8px', borderBottom: '1px solid #333' }}>
-          <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ff5f56' }}></div>
-          <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ffbd2e' }}></div>
-          <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#27c93f' }}></div>
-          <span style={{ color: '#666', fontSize: '12px', marginLeft: '10px' }}>guest@anonmouse-terminal:~</span>
-        </div>
+'use client';
+import { useState } from 'react';
 
-        {/* Terminal Content */}
-        <div style={{ padding: '30px', fontSize: '18px' }}>
-          <p style={{ color: '#fff' }}>[SYSTEM INFO] Initializing Hub...</p>
-          <p style={{ color: '#0f0' }}>&gt; Connection established.</p>
-          <p style={{ color: '#0f0' }}>&gt; Welcome back, Anonmouse.</p>
-          
-          <div style={{ marginTop: '30px', display: 'flex', gap: '10px' }}>
-            <span style={{ color: '#0f0' }}>$</span>
-            <input 
-              type="text" 
-              placeholder="waiting for input..." 
-              autoFocus
-              style={{ background: 'none', border: 'none', outline: 'none', color: '#0f0', width: '100%', fontFamily: 'monospace', fontSize: '18px' }} 
-            />
-          </div>
-        </div>
+export default function Home() {
+  const [input, setInput] = useState('');
+  const [posts, setPosts] = useState(['Welcome to the terminal.', 'Type help to see commands.']);
+
+  function execute(e) {
+    e.preventDefault();
+    const command = input.toLowerCase();
+
+    if (command === 'help') {
+      setPosts([...posts, '> help', 'Commands: post [text], ls, clear']);
+    } else if (command.startsWith('post ')) {
+      const text = input.substring(5);
+      setPosts([...posts, `> ${input}`, 'Post saved!']);
+    } else if (command === 'ls') {
+      setPosts([...posts, '> ls', ...posts.filter(p => !p.startsWith('>'))]);
+    } else if (command === 'clear') {
+      setPosts([]);
+    } else {
+      setPosts([...posts, `> ${input}`, 'Unknown command.']);
+    }
+
+    setInput('');
+  }
+
+  return (
+    <div style={{ backgroundColor: 'black', color: 'white', minHeight: '100vh', padding: '20px', fontFamily: 'monospace' }}>
+      <div style={{ marginBottom: '20px' }}>
+        {posts.map((p, i) => (
+          <div key={i}>{p}</div>
+        ))}
       </div>
-      
-      <p style={{ textAlign: 'center', marginTop: '20px', color: '#333' }}>
-        Press Ctrl+C in terminal to stop server
-      </p>
-    </main>
+      <form onSubmit={execute} style={{ display: 'flex' }}>
+        <span>{'>'}</span>
+        <input 
+          autoFocus
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          style={{ background: 'none', border: 'none', color: 'white', outline: 'none', marginLeft: '10px', width: '100%', fontFamily: 'monospace' }}
+        />
+      </form>
+    </div>
   );
 }
